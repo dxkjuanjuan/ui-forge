@@ -119,3 +119,16 @@ Entry B (文字描述)  ──┘
 ## 📄 License
 
 MIT
+
+
+## 👤 贡献者
+
+<div align="center">
+
+[![dxkjuanjuan](https://avatars.githubusercontent.com/u/197585001?v=4&s=80)](https://github.com/dxkjuanjuan)
+
+**[dxkjuanjuan](https://github.com/dxkjuanjuan)**
+
+Made with ❤️ by 卷卷
+
+</div>
