@@ -1,0 +1,29 @@
+# Backups
+*.bak
+*.tmp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Secrets — NEVER commit
+.env
+.env.*
+*.key
+*.pem
+*.p12
+credentials.json
+secrets.json
+
+# Node
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# Database
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

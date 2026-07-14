@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-brand="default">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ui-forge — 锻造</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cormorant+Garamond:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+/* ═══ TOKEN SYSTEM ═══ */
+:root{
+  --p-primary:#6366f1;--p-primary-hover:#818cf8;--p-accent:#a78bfa;
+  --p-bg:#09090b;--p-surface:#18181b;--p-surface2:#27272a;--p-surface3:#3f3f46;
+  --p-text:#fafafa;--p-text2:#a1a1aa;--p-text3:#71717a;
+  --p-border:rgba(255,255,255,0.06);--p-border2:rgba(255,255,255,0.1);
+  --p-gradient:linear-gradient(135deg,#6366f1,#a78bfa,#f472b6);
+  --p-glow:rgba(99,102,241,0.15);
+  --p-code-bg:#1e1e2e;--p-code-text:#e4e8f0;
+  --m-fast:150ms;--m-normal:350ms;--m-slow:600ms;
+  --ease-out:cubic-bezier(0,0,0.2,1);--ease-expo:cubic-bezier(0.16,1,0.3,1);--ease-spring:cubic-bezier(0.34,1.56,0.64,1);
+  --sp-xs:4px;--sp-sm:8px;--sp-md:16px;--sp-lg:24px;--sp-xl:40px;--sp-2xl:64px;--sp-3xl:96px;
+  --r-sm:6px;--r-md:10px;--r-lg:16px;--r-xl:24px;--r-pill:999px;
+  --f-sans:'Inter',system-ui,-apple-system,sans-serif;
+  --f-display:'Inter',system-ui,sans-serif;
+  --f-mono:'JetBrains Mono','SF Mono',Menlo,monospace;
+  --hero-scale:1;--card-radius:var(--r-lg);--motion-intensity:1;
+}
+
+/* ═══ THEME: Apple ═══ */
+[data-brand="apple"]{
+  --p-primary:#0066cc;--p-primary-hover:#0071e3;--p-accent:#2997ff;
+  --p-bg:#f5f5f7;--p-surface:#ffffff;--p-surface2:#fafafc;--p-surface3:#e8e8ed;
+  --p-text:#1d1d1f;--p-text2:#6e6e73;--p-text3:#86868b;
+  --p-border:rgba(0,0,0,0.08);--p-border2:rgba(0,0,0,0.12);
+  --p-gradient:linear-gradient(135deg,#0066cc,#2997ff);
+  --p-glow:rgba(0,102,204,0.1);--p-code-bg:#1d1d1f;--p-code-text:#f5f5f7;
+  --f-display:'SF Pro Display','Inter',system-ui,sans-serif;
+  --r-lg:18px;--r-xl:24px;--hero-scale:1.05;--motion-intensity:0.6;
+}
+
+/* ═══ THEME: Claude ═══ */
+[data-brand="claude"]{
+  --p-primary:#cc785c;--p-primary-hover:#a9583e;--p-accent:#5db8a6;
+  --p-bg:#faf9f5;--p-surface:#f5f0e8;--p-surface2:#efe9de;--p-surface3:#e8e0d2;
+  --p-text:#141413;--p-text2:#5a5852;--p-text3:#807d72;
+  --p-border:rgba(0,0,0,0.08);--p-border2:#e6dfd8;
+  --p-gradient:linear-gradient(135deg,#cc785c,#e8a55a,#5db8a6);
+  --p-glow:rgba(204,120,92,0.12);--p-code-bg:#181715;--p-code-text:#faf9f5;
+  --f-display:'Cormorant Garamond','Tiempos Headline',serif;
+  --f-sans:'Inter',system-ui,sans-serif;
+  --r-lg:12px;--r-xl:16px;--hero-scale:1;--motion-intensity:0.7;
+}
+
+/* ═══ THEME: Cursor ═══ */
+[data-brand="cursor"]{
+  --p-primary:#f54e00;--p-primary-hover:#d04200;--p-accent:#9fc9a2;
+  --p-bg:#f7f7f4;--p-surface:#ffffff;--p-surface2:#fafaf7;--p-surface3:#e6e5e0;
+  --p-text:#26251e;--p-text2:#5a5852;--p-text3:#807d72;
+  --p-border:#e6e5e0;--p-border2:#cfcdc4;
+  --p-gradient:linear-gradient(135deg,#f54e00,#dfa88f,#9fc9a2);
+  --p-glow:rgba(245,78,0,0.12);--p-code-bg:#26251e;--p-code-text:#f7f7f4;
+  --f-display:'Space Grotesk','Inter',sans-serif;
+  --r-lg:8px;--r-xl:12px;--hero-scale:1;--motion-intensity:0.9;
+}
+
+/* ═══ THEME: Nvidia ═══ */
+[data-brand="nvidia"]{
+  --p-primary:#76b900;--p-primary-hover:#8ed100;--p-accent:#76b900;
+  --p-bg:#0a0a0a;--p-surface:#141414;--p-surface2:#1e1e1e;--p-surface3:#2a2a2a;
+  --p-text:#ffffff;--p-text2:#aaaaaa;--p-text3:#666666;
+  --p-border:rgba(255,255,255,0.06);--p-border2:rgba(255,255,255,0.1);
+  --p-gradient:linear-gradient(135deg,#76b900,#00a651,#76b900);
+  --p-glow:rgba(118,185,0,0.15);--p-code-bg:#1a1a1a;--p-code-text:#e0e0e0;
+  --f-display:'Space Grotesk','Inter',sans-serif;
+  --hero-scale:1.02;--motion-intensity:1.1;
+}
+
+/* ═══ THEME: Tesla ═══ */
+[data-brand="tesla"]{
+  --p-primary:#e31937;--p-primary-hover:#ff2d4b;--p-accent:#e31937;
+  --p-bg:#000000;--p-surface:#0a0a0a;--p-surface2:#141414;--p-surface3:#1e1e1e;
+  --p-text:#ffffff;--p-text2:#999999;--p-text3:#555555;
+  --p-border:rgba(255,255,255,0.05);--p-border2:rgba(255,255,255,0.08);
+  --p-gradient:linear-gradient(135deg,#e31937,#ff6b6b);
+  --p-glow:rgba(227,25,55,0.15);--p-code-bg:#0a0a0a;--p-code-text:#f0f0f0;
+  --f-display:'Inter',system-ui,sans-serif;
+  --r-lg:4px;--r-xl:4px;--hero-scale:1.08;--motion-intensity:0.5;
+}
+
+/* ═══ Legacy brand color overrides ═══ */
+[data-brand="stripe"]{
+  --p-primary:#635bff;--p-primary-hover:#7a73ff;--p-accent:#80e9ff;
+  --p-gradient:linear-gradient(135deg,#635bff,#80e9ff);--p-glow:rgba(99,91,255,0.15);
+}
+[data-brand="vercel"]{
+  --p-primary:#fff;--p-primary-hover:#ddd;--p-accent:#888;
+  --p-gradient:linear-gradient(135deg,#fff,#888);--p-glow:rgba(255,255,255,0.08);
+}
+[data-brand="linear"]{
+  --p-primary:#5e6ad2;--p-primary-hover:#7b85e8;--p-accent:#9ca3f5;
+  --p-gradient:linear-gradient(135deg,#5e6ad2,#9ca3f5,#bd93f9);--p-glow:rgba(94,106,210,0.2);
+}
+[data-brand="spotify"]{
+  --p-primary:#1db954;--p-primary-hover:#1ed760;--p-accent:#1ed760;
+  --p-gradient:linear-gradient(135deg,#1db954,#1ed760);--p-glow:rgba(29,185,84,0.2);
+}
+[data-brand="notion"]{
+  --p-bg:#ffffff;--p-surface:#f7f6f3;--p-surface2:#edece9;--p-surface3:#e3e2df;
+  --p-text:#37352f;--p-text2:#787774;--p-text3:#9b9a97;
+  --p-primary:#2383e2;--p-primary-hover:#3b95f0;--p-accent:#eb5757;
+  --p-border:rgba(0,0,0,0.06);--p-border2:rgba(0,0,0,0.1);
+  --p-gradient:linear-gradient(135deg,#2383e2,#eb5757);--p-glow:rgba(35,131,226,0.1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;}
+body{font-family:var(--f-sans);background:var(--p-bg);color:var(--p-text);transition:background var(--m-slow) var(--ease-out),color var(--m-slow);overflow-x:hidden;line-height:1.5;}
+::selection{background:var(--p-primary);color:#fff;}
+
+/* Scroll Progress */
+.scroll-progress{position:fixed;top:0;left:0;height:2px;background:var(--p-gradient);z-index:999;transition:width 0.1s linear;}
+
+/* Mouse Glow */
+.mouse-glow{position:fixed;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,var(--p-glow) 0%,transparent 70%);pointer-events:none;z-index:1;transform:translate(-50%,-50%);opacity:0;transition:opacity 0.4s;}
+.mouse-glow.active{opacity:1;}
+
+/* Brand Transition Overlay */
+.brand-overlay{position:fixed;inset:0;z-index:300;pointer-events:none;background:var(--p-primary);opacity:0;}
+
+/* Brand Name Display */
+
+/* ═══ Brand Dock ═══ */
+.brand-dock{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;display:flex;gap:4px;padding:8px 14px;background:var(--p-surface);border:1px solid var(--p-border2);border-radius:var(--r-pill);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 8px 32px rgba(0,0,0,0.3);transition:all var(--m-normal);animation:dockIn 0.8s var(--ease-expo) 0.3s both;}
+@keyframes dockIn{from{transform:translateX(-50%) translateY(80px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+.brand-chip{width:32px;height:32px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all var(--m-fast) var(--ease-spring);position:relative;background:var(--p-surface2);flex-shrink:0;}
+.brand-chip:hover{transform:scale(1.18);}
+.brand-chip.active{border-color:var(--p-primary);box-shadow:0 0 12px var(--p-glow);}
+.brand-chip[data-b="default"]{background:linear-gradient(135deg,#6366f1,#a78bfa);}
+.brand-chip[data-b="apple"]{background:linear-gradient(135deg,#f5f5f7,#0066cc);}
+.brand-chip[data-b="claude"]{background:linear-gradient(135deg,#faf9f5,#cc785c);}
+.brand-chip[data-b="cursor"]{background:linear-gradient(135deg,#f7f7f4,#f54e00);}
+.brand-chip[data-b="nvidia"]{background:linear-gradient(135deg,#0a0a0a,#76b900);}
+.brand-chip[data-b="tesla"]{background:linear-gradient(135deg,#000,#e31937);}
+.brand-chip[data-b="stripe"]{background:linear-gradient(135deg,#635bff,#80e9ff);}
+.brand-chip[data-b="vercel"]{background:linear-gradient(135deg,#fff,#666);}
+.brand-chip[data-b="linear"]{background:linear-gradient(135deg,#5e6ad2,#bd93f9);}
+.brand-chip[data-b="spotify"]{background:linear-gradient(135deg,#1db954,#1ed760);}
+.brand-chip[data-b="notion"]{background:linear-gradient(135deg,#f7f6f3,#e3e2df);}
+.dock-divider{width:1px;height:24px;background:var(--p-border2);margin:0 4px;align-self:center;}
+.mode-chip{width:32px;height:32px;border-radius:50%;border:1px solid var(--p-border2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--p-surface2);transition:all var(--m-fast);flex-shrink:0;}
+
+/* ═══ Hero ═══ */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:var(--sp-3xl) var(--sp-lg);position:relative;overflow:hidden;}
+.hero-ambient{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.hero-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.35;transition:background var(--m-normal);}
+.hero-orb-1{width:500px;height:500px;top:-10%;left:-5%;background:var(--p-primary);animation:orbF1 8s ease-in-out infinite;}
+.hero-orb-2{width:400px;height:400px;bottom:-5%;right:-5%;background:var(--p-accent);animation:orbF2 10s ease-in-out infinite;}
+@keyframes orbF1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,15px) scale(0.95)}}
+@keyframes orbF2{0%,100%{transform:translate(0,0)}33%{transform:translate(-25px,20px)}66%{transform:translate(15px,-25px)}}
+.hero-mesh{position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,var(--p-border) 1px,transparent 0);background-size:40px 40px;opacity:0.4;}
+.float-el{position:absolute;pointer-events:none;opacity:0.04;font-size:36px;color:var(--p-text);transition:color var(--m-normal);}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+@keyframes floatY2{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+@keyframes floatX{0%,100%{transform:translateX(0)}50%{transform:translateX(10px)}}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+.hero-marquee{position:absolute;bottom:0;left:0;right:0;overflow:hidden;opacity:0.04;pointer-events:none;white-space:nowrap;font-size:13vw;font-weight:900;letter-spacing:-0.04em;color:var(--p-text);transition:color var(--m-normal);}
+.hero-marquee-inner{display:inline-block;animation:marquee 25s linear infinite;}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+.hero-content{position:relative;z-index:2;max-width:720px;}
+.hero-eyebrow{font-size:13px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--p-primary);margin-bottom:var(--sp-md);transition:color var(--m-normal);}
+.hero-title{font-family:var(--f-display);font-size:clamp(40px,7vw,80px);font-weight:700;letter-spacing:-0.03em;line-height:1.05;margin-bottom:var(--sp-lg);transition:font-family var(--m-slow);}
+.hero-title .char{display:inline-block;opacity:0;transform:translateY(40px) rotateX(-40deg);}
+.hero-title .glow{background:var(--p-gradient);background-size:200% 200%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:gradShift 4s ease-in-out infinite;}
+@keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.hero-sub{font-size:17px;color:var(--p-text2);max-width:520px;margin:0 auto var(--sp-xl);line-height:1.65;transition:color var(--m-normal);}
+.hero-cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+
+/* ═══ Buttons ═══ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;border-radius:var(--r-pill);font-size:16px;font-weight:500;font-family:var(--f-sans);cursor:pointer;border:none;min-height:48px;transition:all var(--m-fast);position:relative;overflow:hidden;}
+.btn-fill{background:var(--p-primary);color:#fff;box-shadow:0 2px 8px var(--p-glow);}
+.btn-fill:hover{background:var(--p-primary-hover);transform:translateY(-1px);box-shadow:0 4px 16px var(--p-glow);}
+.btn-fill:active{transform:scale(0.97);}
+.btn-outline{background:transparent;color:var(--p-text);border:1px solid var(--p-border2);}
+.btn-outline:hover{border-color:var(--p-primary);color:var(--p-primary);}
+
+/* Ripple */
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,0.25);transform:scale(0);animation:rippleAnim 0.6s ease-out forwards;pointer-events:none;}
+@keyframes rippleAnim{to{transform:scale(4);opacity:0}}
+
+/* ═══ Wave Divider ═══ */
+.wave-divider{position:relative;height:60px;overflow:hidden;pointer-events:none;}
+.wave-divider svg{position:absolute;bottom:0;width:100%;height:60px;fill:var(--p-surface);transition:fill var(--m-slow);}
+
+/* ═══ Dashboard Section ═══ */
+.dashboard-section{background:var(--p-surface);padding:var(--sp-3xl) var(--sp-lg);transition:background var(--m-slow);}
+.dashboard-section .sec-label{font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--p-primary);margin-bottom:var(--sp-sm);transition:color var(--m-normal);}
+.dashboard-section h2{font-family:var(--f-display);font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-0.03em;margin-bottom:var(--sp-2xl);transition:color var(--m-normal),font-family var(--m-slow);}
+.dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--sp-lg);max-width:1200px;margin:0 auto;}
+
+/* ═══ Dashboard Cards ═══ */
+.d-card{background:var(--p-bg);border:1px solid var(--p-border);border-radius:var(--card-radius);padding:var(--sp-lg);transition:all var(--m-normal);transform-style:preserve-3d;position:relative;overflow:hidden;}
+.d-card::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.03),transparent);pointer-events:none;transition:left 0.6s ease;}
+.d-card:hover::after{left:120%;}
+.d-card:hover{border-color:var(--p-border2);box-shadow:0 8px 24px var(--p-glow);}
+.d-card-label{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--p-text3);margin-bottom:8px;transition:color var(--m-normal);}
+.d-card-value{font-size:48px;font-weight:800;line-height:1;transition:color var(--m-normal);}
+.d-card-sub{font-size:13px;color:var(--p-text3);margin-top:4px;transition:color var(--m-normal);}
+
+/* Token Palette */
+.token-palette{display:flex;gap:6px;flex-wrap:wrap;}
+.token-swatch{width:32px;height:32px;border-radius:var(--r-sm);cursor:pointer;transition:transform 0.2s var(--ease-spring),box-shadow 0.2s;position:relative;}
+.token-swatch:hover{transform:scale(1.3);box-shadow:0 4px 12px var(--p-glow);}
+.token-swatch .swatch-tip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%) scale(0.8);background:var(--p-surface2);color:var(--p-text);padding:3px 8px;border-radius:var(--r-sm);font-size:10px;font-family:var(--f-mono);white-space:nowrap;opacity:0;pointer-events:none;transition:all var(--m-fast);border:1px solid var(--p-border2);}
+.token-swatch:hover .swatch-tip{opacity:1;transform:translateX(-50%) scale(1);}
+
+/* Mini Chart */
+.mini-chart{display:flex;align-items:flex-end;gap:4px;height:40px;}
+.mini-bar{width:12px;border-radius:2px 2px 0 0;background:var(--p-primary);transition:background var(--m-normal),height 0.6s var(--ease-expo);}
+
+/* Stat Numbers */
+.stat-num{font-size:24px;font-weight:700;transition:color var(--m-normal);}
+.stat-num.counting{text-shadow:0 0 12px var(--p-glow);}
+
+/* Pipeline */
+.pipeline-mini{display:flex;flex-direction:column;gap:12px;}
+.p-stage{display:flex;align-items:center;gap:10px;font-size:13px;opacity:0.7;position:relative;}
+.p-stage.done{opacity:1;}.p-stage.active{opacity:1;}
+.p-dot{width:10px;height:10px;border-radius:50%;background:var(--p-surface3);flex-shrink:0;transition:background var(--m-normal);}
+.p-stage.done .p-dot{background:var(--p-primary);}.p-stage.active .p-dot{background:var(--p-primary);animation:dotPulse 1.5s ease-in-out infinite;}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 0 0 var(--p-glow)}50%{box-shadow:0 0 8px 4px var(--p-glow)}}
+.p-stage-name{font-weight:600;color:var(--p-text);min-width:72px;transition:color var(--m-normal);}
+.p-stage-out{font-family:var(--f-mono);font-size:11px;color:var(--p-text3);transition:color var(--m-normal);}
+
+/* ═══ Component Preview ═══ */
+.component-preview{grid-column:1/-1;}
+.preview-toolbar{display:flex;gap:4px;margin-bottom:var(--sp-md);}
+.preview-tab{padding:6px 14px;font-size:12px;font-weight:500;color:var(--p-text3);background:transparent;border:none;cursor:pointer;border-radius:var(--r-sm);transition:all var(--m-fast);font-family:var(--f-sans);position:relative;}
+.preview-tab.active{color:var(--p-primary);background:var(--p-glow);}
+.preview-tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--p-primary);border-radius:1px;}
+.preview-area{min-height:200px;}
+#tabCode,#tabFigma{display:none;}
+
+/* Live Code — BRIGHTER */
+.live-code{background:var(--p-code-bg);color:var(--p-code-text);padding:var(--sp-lg);border-radius:var(--r-md);font-family:var(--f-mono);font-size:13px;line-height:1.7;overflow-x:auto;transition:background var(--m-slow),color var(--m-slow);}
+.live-code .cmt{color:#94a3b8;opacity:0.85;}.live-code .kw{color:#d4a5ff;font-weight:600;}.live-code .fn{color:#7dd3fc;font-weight:500;}.live-code .str{color:#86efac;}
+
+/* Live Hero */
+.live-hero{padding:var(--sp-xl);text-align:center;border-radius:var(--r-md);background:var(--p-surface);border:1px solid var(--p-border);transition:all var(--m-normal);}
+.live-hero h3{font-family:var(--f-display);font-size:24px;font-weight:700;margin-bottom:8px;transition:font-family var(--m-slow);}
+.live-hero p{color:var(--p-text2);margin-bottom:16px;font-size:14px;transition:color var(--m-normal);}
+
+/* Live Cards */
+.live-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;}
+.live-card{padding:16px;background:var(--p-surface);border:1px solid var(--p-border);border-radius:var(--r-md);cursor:pointer;transition:all var(--m-fast);}
+.live-card:hover{border-color:var(--p-border2);transform:translateY(-2px);}
+.live-card.selected{border-color:var(--p-primary)!important;background:var(--p-glow);}
+.live-card-icon{font-size:24px;margin-bottom:8px;}
+.live-card h4{font-size:14px;font-weight:600;margin-bottom:4px;}
+.live-card p{font-size:12px;color:var(--p-text3);}
+
+/* ═══ Figma Section ═══ */
+.figma-section{padding:var(--sp-3xl) var(--sp-lg);max-width:1200px;margin:0 auto;}
+.figma-section .sec-label{font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--p-primary);text-align:center;margin-bottom:var(--sp-sm);transition:color var(--m-normal);}
+.figma-section h2{font-family:var(--f-display);text-align:center;font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-0.03em;margin-bottom:var(--sp-2xl);transition:color var(--m-normal),font-family var(--m-slow);}
+.figma-flow{display:flex;align-items:stretch;gap:var(--sp-lg);justify-content:center;flex-wrap:wrap;}
+.figma-panel{flex:1;min-width:260px;max-width:420px;background:var(--p-surface);border:1px solid var(--p-border);border-radius:var(--r-lg);padding:var(--sp-lg);transition:all var(--m-normal);}
+.figma-panel-label{font-size:13px;font-weight:600;margin-bottom:var(--sp-md);color:var(--p-text2);transition:color var(--m-normal);}
+.figma-frame-row{padding:10px 12px;border-radius:var(--r-sm);cursor:pointer;transition:all var(--m-fast);font-size:13px;margin-bottom:4px;}
+.figma-frame-row:hover{background:var(--p-surface2);}
+.figma-frame-row.selected{background:var(--p-glow);color:var(--p-primary);}
+.flow-arrow{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--p-text3);font-size:11px;font-weight:600;letter-spacing:0.05em;transition:color var(--m-normal);}
+.flow-arrow svg{width:32px;height:32px;transition:transform 0.3s var(--ease-spring);}
+.flow-arrow:hover svg{transform:translateX(6px);}
+
+/* ═══ Sites Section ═══ */
+.sites-section{padding:var(--sp-3xl) var(--sp-lg);background:var(--p-surface);transition:background var(--m-slow);}
+.sites-section .sec-label{font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--p-primary);text-align:center;margin-bottom:var(--sp-sm);transition:color var(--m-normal);}
+.sites-section h2{font-family:var(--f-display);text-align:center;font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-0.03em;margin-bottom:var(--sp-2xl);transition:color var(--m-normal),font-family var(--m-slow);}
+.sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--sp-md);max-width:1200px;margin:0 auto;}
+.site-card{display:block;padding:var(--sp-lg);background:var(--p-bg);border:1px solid var(--p-border);border-radius:var(--r-lg);text-decoration:none;color:var(--p-text);transition:all var(--m-fast);position:relative;overflow:hidden;}
+.site-card:hover{transform:translateY(-4px);border-color:var(--p-primary);box-shadow:0 8px 24px var(--p-glow);}
+.site-card::before{content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:var(--p-gradient);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity 0.4s;}
+.site-card:hover::before{opacity:1;}
+.site-phase{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--p-primary);display:block;margin-bottom:8px;transition:color var(--m-normal);}
+.site-name{font-size:16px;font-weight:700;margin-bottom:4px;}
+.site-role{font-size:12px;color:var(--p-text3);transition:color var(--m-normal);}
+
+/* ═══ CTA Section ═══ */
+.cta-section{padding:var(--sp-3xl) var(--sp-lg);display:flex;justify-content:center;}
+.cta-box{background:var(--p-surface);border:1px solid var(--p-border);border-radius:var(--r-xl);padding:var(--sp-3xl) var(--sp-2xl);text-align:center;max-width:640px;width:100%;position:relative;overflow:hidden;transition:all var(--m-normal);}
+.cta-box::before{content:'';position:absolute;inset:-50%;background:conic-gradient(from 0deg,transparent,var(--p-glow),transparent,var(--p-glow),transparent);animation:ctaRot 8s linear infinite;opacity:0.3;}
+@keyframes ctaRot{to{transform:rotate(360deg)}}
+.cta-box::after{content:'';position:absolute;inset:2px;background:var(--p-surface);border-radius:inherit;z-index:1;transition:background var(--m-slow);}
+.cta-box>*{position:relative;z-index:2;}
+.cta-box h2{font-family:var(--f-display);font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-0.03em;margin-bottom:var(--sp-md);transition:font-family var(--m-slow);}
+.cta-box p{color:var(--p-text2);margin-bottom:var(--sp-lg);transition:color var(--m-normal);}
+.terminal{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;background:var(--p-code-bg);border-radius:var(--r-md);font-family:var(--f-mono);font-size:14px;color:var(--p-code-text);margin-bottom:var(--sp-lg);transition:background var(--m-slow),color var(--m-slow);}
+.terminal .prompt{color:var(--p-primary);font-weight:600;}
+.terminal .cmd{color:var(--p-code-text);font-weight:600;}
+.terminal .arg{color:#a6e3a1;}
+.terminal .cursor-blink{display:inline-block;width:2px;height:1.1em;background:var(--p-primary);margin-left:2px;animation:blink 1s step-end infinite;vertical-align:text-bottom;}
+@keyframes blink{50%{opacity:0}}
+
+/* ═══ Footer ═══ */
+.footer{text-align:center;padding:var(--sp-xl) var(--sp-lg);color:var(--p-text3);font-size:13px;border-top:1px solid var(--p-border);position:relative;transition:color var(--m-normal),border-color var(--m-normal);}
+
+/* ═══ Scroll Reveal ═══ */
+.reveal-up{opacity:0;transform:translateY(30px);}
+.reveal-scale{opacity:0;transform:scale(0.92);}
+
+/* ═══ Toast ═══ */
+.toast{position:fixed;top:24px;right:24px;padding:12px 20px;background:var(--p-surface);border:1px solid var(--p-border2);border-radius:var(--r-md);color:var(--p-text);font-size:13px;z-index:500;animation:toastIn 0.3s var(--ease-spring),toastOut 0.3s 2.5s ease-in forwards;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
+@keyframes toastIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastOut{to{opacity:0;transform:translateY(-12px)}}
+
+/* Particle Canvas */
+#particleCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* Responsive */
+@media(max-width:768px){
+  .figma-flow{flex-direction:column;align-items:center;}
+  .flow-arrow{transform:rotate(90deg);}
+  .sites-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));}
+}
+</style>
+</head>
+<body>
+<div class="brand-overlay" id="brandOverlay"></div>
+<div class="scroll-progress" id="scrollProgress"></div>
+<div class="mouse-glow" id="mouseGlow"></div>
+<canvas id="particleCanvas"></canvas></div>
+
+<!-- Brand Dock (color quick-switch) -->
+<div class="brand-dock" role="toolbar" aria-label="主题切换">  <button class="brand-chip active" data-b="default" aria-label="ui-forge"></button>
+  <button class="brand-chip" data-b="apple" aria-label="Apple"></button>
+  <button class="brand-chip" data-b="claude" aria-label="Claude"></button>
+  <button class="brand-chip" data-b="cursor" aria-label="Cursor"></button>
+  <button class="brand-chip" data-b="nvidia" aria-label="Nvidia"></button>
+  <button class="brand-chip" data-b="tesla" aria-label="Tesla"></button>
+  <div class="dock-divider"></div>
+  <button class="brand-chip" data-b="stripe" aria-label="Stripe"></button>
+  <button class="brand-chip" data-b="vercel" aria-label="Vercel"></button>
+  <button class="brand-chip" data-b="linear" aria-label="Linear"></button>
+  <button class="brand-chip" data-b="spotify" aria-label="Spotify"></button>
+  <button class="brand-chip" data-b="notion" aria-label="Notion"></button>
+  <button class="mode-chip" id="modeToggle" aria-label="切换明暗模式">☀️</button>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-ambient">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-mesh"></div>
+    <div class="float-el" style="top:15%;left:8%;font-size:48px;animation:floatY 6s ease-in-out infinite;">◆</div>
+    <div class="float-el" style="top:25%;right:12%;font-size:32px;animation:floatY2 5s ease-in-out infinite 1s;">●</div>
+    <div class="float-el" style="bottom:20%;left:15%;font-size:24px;animation:floatX 7s ease-in-out infinite;">◇</div>
+    <div class="float-el" style="top:40%;right:8%;font-size:36px;animation:spin 20s linear infinite;">✦</div>
+    <div class="float-el" style="bottom:30%;right:20%;font-size:28px;animation:floatY 8s ease-in-out infinite 2s;">△</div>
+    <div class="hero-marquee"><div class="hero-marquee-inner">UI FORGE · DISCOVER · TOKENIZE · COMPOSE · ANIMATE · POLISH · UI FORGE · DISCOVER · TOKENIZE · COMPOSE · ANIMATE · POLISH · </div></div>
+  </div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">5-Stage UI Design Forge</p>
+    <h1 class="hero-title">锻造<br><span class="glow" id="typingTarget">每一个界面</span></h1>
+    <p class="hero-sub">切换右上角主题或底部品牌，整个页面实时变脸。这就是 ui-forge 的 Token 驱动力。<br><span style="font-size:13px;opacity:0.6;font-family:var(--f-mono);">9 skills · 9 sites · 73 brands · Figma ↔ Code</span></p>
+    <div class="hero-cta-row">
+      <button class="btn btn-fill" onclick="document.querySelector('.dashboard-section').scrollIntoView({behavior:'smooth'})">查看锻造结果 ↓</button>
+      <a class="btn btn-outline" href="https://github.com" target="_blank" rel="noopener" style="text-decoration:none;">GitHub →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Live Dashboard -->
+<div class="wave-divider"><svg viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0,30 C300,60 600,0 900,30 C1050,50 1150,10 1200,30 L1200,60 L0,60 Z"></path></svg></div>
+<section class="dashboard-section">
+  <p class="sec-label reveal-up">Forged Output</p>
+  <h2 class="reveal-up">实时锻造结果</h2>
+  <div class="dashboard">
+    <div class="d-card reveal-scale">
+      <div class="d-card-label">Token 色板</div>
+      <div class="token-palette" id="tokenPalette"></div>
+      <div style="margin-top:16px;">
+        <div class="d-card-label">Typography</div>
+        <div style="font-size:24px;font-weight:700;letter-spacing:-0.02em;transition:color var(--m-normal);">Aa</div>
+        <div style="font-size:11px;color:var(--p-text3);font-family:var(--f-mono);transition:color var(--m-normal);">Inter 700 / 400</div>
+      </div>
+      <div style="margin-top:16px;">
+        <div class="d-card-label">Motion</div>
+        <div class="mini-chart" id="motionChart"></div>
+      </div>
+    </div>
+    <div class="d-card reveal-scale">
+      <div class="d-card-label">Forge Stats</div>
+      <div class="d-card-value" style="color:var(--p-primary);transition:color var(--m-normal);">5</div>
+      <div class="d-card-sub">锻造阶段</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;">
+        <div><div class="stat-num" data-count="9">0</div><div style="font-size:11px;color:var(--p-text3);">子 Skill</div></div>
+        <div><div class="stat-num" data-count="9">0</div><div style="font-size:11px;color:var(--p-text3);">参考网站</div></div>
+        <div><div class="stat-num" data-count="73">0</div><div style="font-size:11px;color:var(--p-text3);">品牌 DESIGN.md</div></div>
+        <div><div class="stat-num" data-count="6">0</div><div style="font-size:11px;color:var(--p-text3);">技术栈</div></div>
+      </div>
+    </div>
+    <div class="d-card reveal-scale">
+      <div class="d-card-label">Pipeline Progress</div>
+      <div class="pipeline-mini">
+        <div class="p-stage done"><div class="p-dot"></div><span class="p-stage-name">Discover</span><span class="p-stage-out">direction.md</span></div>
+        <div class="p-stage done"><div class="p-dot"></div><span class="p-stage-name">Tokenize</span><span class="p-stage-out">tokens.json</span></div>
+        <div class="p-stage active"><div class="p-dot"></div><span class="p-stage-name">Compose</span><span class="p-stage-out">tree.md</span></div>
+        <div class="p-stage"><div class="p-dot"></div><span class="p-stage-name">Animate</span><span class="p-stage-out">anim.md</span></div>
+        <div class="p-stage"><div class="p-dot"></div><span class="p-stage-name">Polish</span><span class="p-stage-out">checklist.md</span></div>
+      </div>
+    </div>
+    <div class="d-card component-preview reveal-scale">
+      <div class="preview-toolbar">
+        <button class="preview-tab active" data-tab="visual">Visual</button>
+        <button class="preview-tab" data-tab="code">Code</button>
+        <button class="preview-tab" data-tab="figma">Figma↔Code</button>
+      </div>
+      <div class="preview-area" id="previewArea">
+        <div id="tabVisual">
+          <div class="live-hero">
+            <h3>构建你的下一个产品</h3>
+            <p>从 Figma 设计稿到生产级代码，5阶段全流程</p>
+            <button class="btn btn-fill" onclick="cycleBrand()">切换品牌 →</button>
+          </div>
+        </div>
+        <div id="tabCode" style="display:none;">
+          <div class="live-code"><span class="cmt">// Phase 3 → 4: Compose + Animate</span>
+<span class="kw">import</span> { <span class="fn">motion</span> } <span class="kw">from</span> <span class="str">"motion/react"</span>;
+
+<span class="kw">export function</span> <span class="fn">Hero</span>() {
+  <span class="kw">return</span> (
+    <span class="str">&lt;motion.section</span>
+      <span class="fn">initial</span>={{ <span class="fn">opacity</span>: <span class="fn">0</span>, <span class="fn">y</span>: <span class="fn">24</span> }}
+      <span class="fn">animate</span>={{ <span class="fn">opacity</span>: <span class="fn">1</span>, <span class="fn">y</span>: <span class="fn">0</span> }}
+      <span class="fn">transition</span>={{ <span class="fn">duration</span>: <span class="fn">0.6</span>,
+        <span class="fn">ease</span>: [<span class="fn">0.16</span>,<span class="fn">1</span>,<span class="fn">0.3</span>,<span class="fn">1</span>] }}
+    &gt;
+      &lt;h1&gt;Build your next product&lt;/h1&gt;
+    &lt;/motion.section&gt;
+  );
+}</div>
+        </div>
+        <div id="tabFigma" style="display:none;">
+          <div class="live-cards">
+            <div class="live-card" onclick="this.classList.toggle('selected')" style="border-color:var(--p-primary);">
+              <div class="live-card-icon">🎨</div><h4>Hero Section</h4><p>Auto Layout → Flexbox</p>
+            </div>
+            <div class="live-card" onclick="this.classList.toggle('selected')">
+              <div class="live-card-icon">📦</div><h4>Feature Card</h4><p>Component → Reusable</p>
+            </div>
+            <div class="live-card" onclick="this.classList.toggle('selected')">
+              <div class="live-card-icon">🔘</div><h4>CTA Button</h4><p>Variables → CSS vars</p>
+            </div>
+            <div class="live-card" onclick="this.classList.toggle('selected')">
+              <div class="live-card-icon">☰</div><h4>Navigation</h4><p>Constraints → Responsive</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Figma Flow -->
+<section class="figma-section">
+  <p class="sec-label reveal-up" style="text-align:center;">Figma ↔ Code</p>
+  <h2 class="reveal-up" style="text-align:center;">双向闭环</h2>
+  <div class="figma-flow">
+    <div class="figma-panel">
+      <div class="figma-panel-label">🎨 Figma</div>
+      <div class="figma-frames">
+        <div class="figma-frame-row selected" onclick="pickFrame(this,'hero')">🎨 Hero — Auto Layout</div>
+        <div class="figma-frame-row" onclick="pickFrame(this,'card')">📦 Card — Component</div>
+        <div class="figma-frame-row" onclick="pickFrame(this,'btn')">🔘 CTA — Variables</div>
+        <div class="figma-frame-row" onclick="pickFrame(this,'nav')">☰ Nav — Constraints</div>
+      </div>
+    </div>
+    <div class="flow-arrow">
+      <svg viewBox="0 0 40 40" fill="none"><path d="M8 20h24m0 0l-6-6m6 6l-6 6" stroke="currentColor" stroke-width="1.5"/></svg>
+      <span>forge</span>
+    </div>
+    <div class="figma-panel code-panel">
+      <div class="figma-panel-label">⌨️ Code</div>
+      <div class="live-code" id="figmaCode"><span class="cmt">// Click a Figma frame →</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 Sites -->
+<section class="sites-section">
+  <p class="sec-label reveal-up" style="text-align:center;">Reference</p>
+  <h2 class="reveal-up" style="text-align:center;">9 参考网站</h2>
+  <div class="sites-grid">
+    <a class="site-card" href="https://godly.website" target="_blank" rel="noopener"><span class="site-phase">Phase 1</span><div class="site-name">Godly</div><div class="site-role">视觉方向</div></a>
+    <a class="site-card" href="https://pageflow.app" target="_blank" rel="noopener"><span class="site-phase">Phase 1</span><div class="site-name">Pageflow</div><div class="site-role">叙事结构</div></a>
+    <a class="site-card" href="https://animate-ui.com" target="_blank" rel="noopener"><span class="site-phase">Phase 2</span><div class="site-name">Animate UI</div><div class="site-role">动效 Token</div></a>
+    <a class="site-card" href="https://gsap.com" target="_blank" rel="noopener"><span class="site-phase">Phase 2</span><div class="site-name">GSAP</div><div class="site-role">Timing 标准</div></a>
+    <a class="site-card" href="https://reactbits.dev" target="_blank" rel="noopener"><span class="site-phase">Phase 3</span><div class="site-name">React Bits</div><div class="site-role">组件片段</div></a>
+    <a class="site-card" href="https://ui.aceternity.com" target="_blank" rel="noopener"><span class="site-phase">Phase 3</span><div class="site-name">Aceternity UI</div><div class="site-role">高端组件</div></a>
+    <a class="site-card" href="https://motion.dev" target="_blank" rel="noopener"><span class="site-phase">Phase 4</span><div class="site-name">Framer Motion</div><div class="site-role">React 动效</div></a>
+    <a class="site-card" href="https://motion-primitives.com" target="_blank" rel="noopener"><span class="site-phase">Phase 4</span><div class="site-name">Motion Primitives</div><div class="site-role">基础动效</div></a>
+    <a class="site-card" href="https://gsap.com/showcase" target="_blank" rel="noopener"><span class="site-phase">Phase 4</span><div class="site-name">GSAP Showcase</div><div class="site-role">顶级案例</div></a>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-box">
+    <h2>准备锻造？</h2>
+    <p>一条命令，从需求到交付。</p>
+    <div class="terminal"><span class="prompt">$</span> <span class="cmd">ui-forge</span> <span class="arg" id="terminalArg">"做一个 Stripe 风格的定价页"</span><span class="cursor-blink" id="termCursor"></span></div>
+    <button class="btn btn-fill" onclick="showToast('已复制到剪贴板');navigator.clipboard.writeText('ui-forge \"做一个 Stripe 风格的定价页\"').catch(()=>{})">开始锻造 →</button>
+  </div>
+</section>
+
+<footer class="footer">ui-forge v2.0 · 5阶段锻造 · 11 主题 · Codex + Claude Code</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ═══ Data ═══
+const brandColors = {
+  default:['#6366f1','#818cf8','#a78bfa','#c4b5fd','#f472b6','#09090b','#27272a','#fafafa'],
+  apple:['#0066cc','#0071e3','#2997ff','#f5f5f7','#1d1d1f','#ffffff','#6e6e73','#e8e8ed'],
+  claude:['#cc785c','#a9583e','#5db8a6','#e8a55a','#faf9f5','#141413','#f5f0e8','#efe9de'],
+  cursor:['#f54e00','#d04200','#9fc9a2','#dfa88f','#f7f7f4','#26251e','#ffffff','#e6e5e0'],
+  nvidia:['#76b900','#8ed100','#00a651','#0a0a0a','#141414','#ffffff','#1e1e1e','#2a2a2a'],
+  tesla:['#e31937','#ff2d4b','#ff6b6b','#000000','#0a0a0a','#ffffff','#141414','#555555'],
+  stripe:['#635bff','#7a73ff','#80e9ff','#00d4ff','#0a2540','#f6f9fc','#425466','#a3acf9'],
+  vercel:['#ffffff','#cccccc','#888888','#444444','#000000','#0070f3','#50e3c2','#7928ca'],
+  linear:['#5e6ad2','#7b85e8','#9ca3f5','#bd93f9','#1a1a2e','#e2e4ed','#8b8fa3','#5e6ad2'],
+  spotify:['#1db954','#1ed760','#191414','#282828','#535353','#b3b3b3','#ffffff','#121212'],
+  notion:['#2383e2','#3b95f0','#eb5757','#9f6b53','#37352f','#f7f6f3','#9b9a97','#e3e2df'],
+};
+const brandNames = {default:'ui-forge',apple:'Apple',claude:'Claude',cursor:'Cursor',nvidia:'NVIDIA',tesla:'Tesla',stripe:'Stripe',vercel:'Vercel',linear:'Linear',spotify:'Spotify',notion:'Notion'};
+const figmaSnippets = {
+  hero:'<span class="cmt">// Figma Hero → Auto Layout → Flex</span>\n<span class="kw">export const</span> <span class="fn">Hero</span> = () <span class="kw">=></span> (\n  <span class="str">&lt;motion.section</span>\n    <span class="fn">initial</span>={{ <span class="fn">opacity</span>:<span class="fn">0</span>, <span class="fn">y</span>:<span class="fn">24</span> }}\n    <span class="fn">animate</span>={{ <span class="fn">opacity</span>:<span class="fn">1</span>, <span class="fn">y</span>:<span class="fn">0</span> }}\n    <span class="fn">transition</span>={{ <span class="fn">duration</span>:<span class="fn">0.6</span> }}\n  &gt;\n    &lt;h1&gt;{title}&lt;/h1&gt;\n  <span class="str">&lt;/motion.section&gt;</span>\n)',
+  card:'<span class="cmt">// Figma Card → Component → Reusable</span>\n<span class="kw">export const</span> <span class="fn">Card</span> = ({ title, desc }) <span class="kw">=></span> (\n  <span class="str">&lt;div className=</span><span class="str">"rounded-xl p-5 bg-[var(--p-surface)]"</span><span class="str">&gt;</span>\n    &lt;h4&gt;{title}&lt;/h4&gt;\n    &lt;p&gt;{desc}&lt;/p&gt;\n  <span class="str">&lt;/div&gt;</span>\n)',
+  btn:'<span class="cmt">// Figma CTA → Variables → CSS vars</span>\n<span class="kw">export const</span> <span class="fn">CTA</span> = ({ children }) <span class="kw">=></span> (\n  <span class="str">&lt;button className=</span><span class="str">"px-7 py-3.5\n    rounded-[var(--r-pill)]\n    bg-[var(--p-primary)] text-white"</span><span class="str">&gt;</span>\n    {children}\n  <span class="str">&lt;/button&gt;</span>\n)',
+  nav:'<span class="cmt">// Figma Nav → Constraints → Responsive</span>\n<span class="kw">export const</span> <span class="fn">Nav</span> = () <span class="kw">=></span> (\n  <span class="str">&lt;nav className=</span><span class="str">"fixed top-0 inset-x-0\n    backdrop-blur-xl bg-black/80"</span><span class="str">&gt;</span>\n    &lt;Logo /&gt;\n    &lt;DesktopLinks /&gt;\n  <span class="str">&lt;/nav&gt;</span>\n)',
+};
+
+// ═══ Init Token Palette ═══
+function renderPalette(brand) {
+  const colors = brandColors[brand] || brandColors.default;
+  const el = document.getElementById('tokenPalette');
+  el.innerHTML = '';
+  colors.forEach(c => {
+    const s = document.createElement('div');
+    s.className = 'token-swatch';
+    s.style.background = c;
+    s.setAttribute('aria-label', c);
+    s.setAttribute('tabindex', '0');
+    s.addEventListener('click', () => { navigator.clipboard.writeText(c).catch(()=>{}); gsap.fromTo(s,{scale:1.3},{scale:1,duration:0.3,ease:'back.out(2)'}); showToast('已复制: '+c); });
+    const tip = document.createElement('div');
+    tip.className = 'swatch-tip';
+    tip.textContent = c;
+    s.appendChild(tip);
+    el.appendChild(s);
+  });
+}
+
+// ═══ Motion Chart ═══
+function renderMotionChart() {
+  const el = document.getElementById('motionChart');
+  el.innerHTML = '';
+  [40,65,50,80,35,70,55].forEach(h => {
+    const bar = document.createElement('div');
+    bar.className = 'mini-bar';
+    bar.style.height = h + '%';
+    el.appendChild(bar);
+  });
+}
+
+// ═══ Brand Switch ═══
+function setBrand(brand) {
+  document.documentElement.setAttribute('data-brand', brand);
+  renderPalette(brand);
+  // Update active states
+  document.querySelectorAll('.brand-chip').forEach(b => b.classList.toggle('active', b.dataset.b === brand));
+  // Transition overlay
+  gsap.fromTo('#brandOverlay',{opacity:0.06},{opacity:0,duration:0.5,ease:'power2.out'});
+  // Animate cards
+  gsap.fromTo('.d-card',{y:6,opacity:0.7},{y:0,opacity:1,duration:0.4,stagger:0.05,ease:'power2.out',delay:0.05});
+  // Animate swatches
+  gsap.fromTo('.token-swatch',{scale:0.8,opacity:0},{scale:1,opacity:1,duration:0.3,stagger:0.03,ease:'back.out(1.5)',delay:0.1});
+}
+
+// Dock chip clicks
+document.querySelector('.brand-dock').addEventListener('click', e => {
+  const chip = e.target.closest('.brand-chip');
+  if (chip) setBrand(chip.dataset.b);
+});
+
+
+// ═══ Cycle Brand ═══
+function cycleBrand() {
+  const brands = Object.keys(brandColors);
+  const cur = document.documentElement.getAttribute('data-brand') || 'default';
+  const next = brands[(brands.indexOf(cur) + 1) % brands.length];
+  setBrand(next);
+}
+
+// ═══ Mode Toggle ═══
+document.getElementById('modeToggle').addEventListener('click', () => {
+  const mode = document.documentElement.getAttribute('data-mode');
+  document.documentElement.setAttribute('data-mode', mode === 'light' ? '' : 'light');
+  document.getElementById('modeToggle').textContent = mode === 'light' ? '☀️' : '🌙';
+});
+
+// ═══ Preview Tabs ═══
+document.querySelectorAll('.preview-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const id = 'tab' + tab.dataset.tab.charAt(0).toUpperCase() + tab.dataset.tab.slice(1);
+    document.querySelectorAll('#previewArea > div').forEach(d => d.style.display = 'none');
+    document.getElementById(id).style.display = '';
+    gsap.fromTo('#previewArea',{opacity:0.5,y:8},{opacity:1,y:0,duration:0.3,ease:'power2.out'});
+  });
+});
+
+// ═══ Figma Code Snippets ═══
+function pickFrame(el, key) {
+  document.querySelectorAll('.figma-frame-row').forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+  const codeEl = document.getElementById('figmaCode');
+  gsap.to(codeEl, {opacity:0,duration:0.15,onComplete:()=>{codeEl.innerHTML=figmaSnippets[key];gsap.to(codeEl,{opacity:1,duration:0.3});}});
+}
+
+// ═══ Toast ═══
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ═══ Scroll Progress ═══
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  document.getElementById('scrollProgress').style.width = (window.scrollY / h * 100) + '%';
+}, {passive:true});
+
+// ═══ Mouse Glow ═══
+const mouseGlow = document.getElementById('mouseGlow');
+let mX=0,mY=0,gX=0,gY=0;
+document.addEventListener('mousemove', e => {mX=e.clientX;mY=e.clientY;mouseGlow.classList.add('active');});
+document.addEventListener('mouseleave', () => mouseGlow.classList.remove('active'));
+(function glowLoop(){gX+=(mX-gX)*0.08;gY+=(mY-gY)*0.08;mouseGlow.style.left=gX+'px';mouseGlow.style.top=gY+'px';requestAnimationFrame(glowLoop);})();
+
+// ═══ Hero Char Split ═══
+(function(){
+  const t = document.getElementById('typingTarget');
+  if(!t)return;
+  const text = t.textContent;
+  t.textContent = '';
+  [...text].forEach((c,i) => {
+    const s = document.createElement('span');
+    s.className = 'char';
+    s.textContent = c === ' ' ? '\u00A0' : c;
+    t.appendChild(s);
+  });
+  setTimeout(() => {
+    gsap.to('#typingTarget .char', {opacity:1,y:0,rotateX:0,duration:0.6,ease:'back.out(1.4)',stagger:0.035,delay:0.3});
+  }, 200);
+})();
+
+// ═══ Hero Entrance ═══
+gsap.timeline({delay:0.1})
+  .from('.hero-eyebrow',{opacity:0,y:20,duration:0.5,ease:'power2.out'})
+  .from('.hero-title',{opacity:0,y:30,duration:0.6,ease:'power3.out'},'-=0.2')
+  .from('.hero-sub',{opacity:0,y:20,duration:0.5,ease:'power2.out'},'-=0.3')
+  .from('.hero-cta-row .btn',{opacity:0,y:16,scale:0.95,duration:0.4,ease:'back.out(1.4)',stagger:0.1},'-=0.2')
+  .from('.hero-marquee',{opacity:0,duration:0.6},'-=0.3');
+
+// ═══ Scroll Reveal ═══
+gsap.utils.toArray('.reveal-up').forEach(el => {
+  gsap.to(el,{opacity:1,y:0,duration:0.6,ease:'power2.out',scrollTrigger:{trigger:el,start:'top 88%',once:true}});
+});
+gsap.utils.toArray('.reveal-scale').forEach(el => {
+  gsap.to(el,{opacity:1,scale:1,duration:0.6,ease:'back.out(1.2)',scrollTrigger:{trigger:el,start:'top 88%',once:true}});
+});
+
+// ═══ Dashboard Entrance ═══
+ScrollTrigger.create({trigger:'.dashboard-section',start:'top 80%',once:true,onEnter:()=>{
+  gsap.from('.d-card',{opacity:0,y:24,scale:0.95,duration:0.5,stagger:0.12,ease:'back.out(1.3)',delay:0.2});
+}});
+
+// ═══ Figma Section ═══
+ScrollTrigger.create({trigger:'.figma-section',start:'top 80%',once:true,onEnter:()=>{
+  gsap.from('.figma-panel',{opacity:0,x:-30,duration:0.6,stagger:0.2,ease:'power2.out'});
+  gsap.from('.flow-arrow',{opacity:0,scale:0.8,duration:0.5,delay:0.3,ease:'back.out(1.4)'});
+}});
+
+// ═══ Site Cards ═══
+// Site cards — start visible, animate on scroll
+ScrollTrigger.create({trigger:'.sites-grid',start:'top 90%',once:true,onEnter:()=>{
+  gsap.from('.site-card',{y:20,scale:0.95,duration:0.4,stagger:{each:0.06,from:'start'},ease:'back.out(1.2)'});
+}});
+
+// ═══ Stat Counter ═══
+ScrollTrigger.create({trigger:'.stat-num',start:'top 85%',once:true,onEnter:()=>{
+  document.querySelectorAll('.stat-num[data-count]').forEach(el => {
+    el.classList.add('counting');
+    const target=parseInt(el.dataset.count);
+    gsap.to({val:0},{val:target,duration:1.5,ease:'power2.out',onUpdate:function(){el.textContent=Math.round(this.targets()[0].val);},onComplete:()=>el.classList.remove('counting')});
+  });
+}});
+
+// ═══ Pipeline Stagger ═══
+ScrollTrigger.create({trigger:'.pipeline-mini',start:'top 85%',once:true,onEnter:()=>{
+  gsap.from('.p-stage',{opacity:0,x:-20,duration:0.4,stagger:0.12,ease:'power2.out'});
+}});
+
+// ═══ Motion Chart Bars ═══
+ScrollTrigger.create({trigger:'.mini-chart',start:'top 85%',once:true,onEnter:()=>{
+  document.querySelectorAll('.mini-bar').forEach((bar,i) => {
+    const h=bar.style.height;bar.style.height='0%';
+    setTimeout(()=>gsap.to(bar,{height:h,duration:0.6,ease:'power2.out'}),i*80);
+  });
+}});
+
+// ═══ Terminal Typing ═══
+(function(){
+  const argEl=document.getElementById('terminalArg'),cur=document.getElementById('termCursor');
+  if(!argEl)return;
+  const full=argEl.textContent;argEl.textContent='';
+  ScrollTrigger.create({trigger:'.cta-section',start:'top 80%',once:true,onEnter:()=>{
+    let i=0;
+    (function t(){if(i<full.length){argEl.textContent+=full[i];i++;setTimeout(t,40+Math.random()*30);}})();
+  }});
+})();
+
+// ═══ Footer ═══
+gsap.from('.footer',{opacity:0,y:10,duration:0.5,scrollTrigger:{trigger:'.footer',start:'top 95%',once:true}});
+
+// ═══ Card Tilt ═══
+document.querySelectorAll('.d-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width-0.5;
+    const y=(e.clientY-r.top)/r.height-0.5;
+    gsap.to(card,{rotateY:x*8,rotateX:-y*8,duration:0.3,ease:'power2.out',transformPerspective:800});
+  });
+  card.addEventListener('mouseleave',()=>gsap.to(card,{rotateY:0,rotateX:0,duration:0.5,ease:'elastic.out(1,0.5)'}));
+});
+
+// ═══ Magnetic Buttons ═══
+document.querySelectorAll('.btn').forEach(btn=>{
+  btn.addEventListener('mousemove',e=>{
+    const r=btn.getBoundingClientRect();
+    gsap.to(btn,{x:(e.clientX-r.left-r.width/2)*0.15,y:(e.clientY-r.top-r.height/2)*0.15,duration:0.3,ease:'power2.out'});
+  });
+  btn.addEventListener('mouseleave',()=>gsap.to(btn,{x:0,y:0,duration:0.4,ease:'elastic.out(1,0.5)'}));
+});
+
+// ═══ Ripple ═══
+document.querySelectorAll('.btn-fill').forEach(btn=>{
+  btn.addEventListener('click',function(e){
+    const r=document.createElement('span');r.className='ripple';
+    const rect=this.getBoundingClientRect();const size=Math.max(rect.width,rect.height);
+    r.style.width=r.style.height=size+'px';
+    r.style.left=(e.clientX-rect.left-size/2)+'px';
+    r.style.top=(e.clientY-rect.top-size/2)+'px';
+    this.appendChild(r);setTimeout(()=>r.remove(),600);
+  });
+});
+
+// ═══ Particles ═══
+const pCanvas=document.getElementById('particleCanvas'),pCtx=pCanvas.getContext('2d');
+let particles=[];
+function resizeP(){pCanvas.width=window.innerWidth;pCanvas.height=window.innerHeight;}
+resizeP();window.addEventListener('resize',resizeP);
+let pMX=-1000,pMY=-1000;
+document.addEventListener('mousemove',e=>{pMX=e.clientX;pMY=e.clientY;});
+class Particle{
+  constructor(){this.reset();}
+  reset(){this.x=Math.random()*pCanvas.width;this.y=Math.random()*pCanvas.height;this.size=Math.random()*1.5+0.5;this.vx=(Math.random()-0.5)*0.3;this.vy=(Math.random()-0.5)*0.3;this.alpha=Math.random()*0.3+0.1;}
+  update(){
+    const dx=this.x-pMX,dy=this.y-pMY,dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<150&&dist>0){const f=(150-dist)/150*0.5;this.vx+=dx/dist*f;this.vy+=dy/dist*f;}
+    this.vx*=0.99;this.vy*=0.99;this.vx+=(Math.random()-0.5)*0.01;this.vy+=(Math.random()-0.5)*0.01;
+    this.x+=this.vx;this.y+=this.vy;
+    if(this.x<0||this.x>pCanvas.width||this.y<0||this.y>pCanvas.height)this.reset();
+  }
+  draw(){pCtx.beginPath();pCtx.arc(this.x,this.y,this.size,0,Math.PI*2);pCtx.fillStyle='rgba(255,255,255,'+this.alpha+')';pCtx.fill();}
+}
+for(let i=0;i<60;i++)particles.push(new Particle());
+function drawP(){
+  pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
+  particles.forEach(p=>{p.update();p.draw();});
+  for(let i=0;i<particles.length;i++){for(let j=i+1;j<particles.length;j++){
+    const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y,dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<120){pCtx.beginPath();pCtx.strokeStyle='rgba(255,255,255,'+(0.04*(1-dist/120))+')';pCtx.lineWidth=0.5;pCtx.moveTo(particles[i].x,particles[i].y);pCtx.lineTo(particles[j].x,particles[j].y);pCtx.stroke();}
+  }}
+  requestAnimationFrame(drawP);
+}
+if(!window.matchMedia('(prefers-reduced-motion:reduce)').matches)drawP();
+
+// ═══ Parallax ═══
+window.addEventListener('scroll',()=>{
+  const s=window.scrollY;
+  gsap.to('.hero-orb-1',{y:s*0.15,duration:0.3,ease:'none'});
+  gsap.to('.hero-orb-2',{y:s*0.1,duration:0.3,ease:'none'});
+  gsap.to('.float-el',{y:(i)=>s*(0.05+i*0.02),duration:0.3,ease:'none'});
+},{passive:true});
+
+// Init
+renderPalette('default');
+renderMotionChart();
+</script>
+</body>
+</html>
